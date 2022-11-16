@@ -1,0 +1,30 @@
+Common language patterns
+
+Recurring grammatical structures are language patterns.
+    Subject-verb-object is a language pattern in english .
+
+Fundamental language patterns exist.
+Human brain puts constarints on natural language.
+
+Abstract computer language patterns:
+    - Sequence
+        Sequence of elements, such as the values in an array initializer.
+    - Choice
+        Choice between multiple, alternative phrases such as the different kinds of statements in a programming language.
+    - Token dependence
+        The presence of one token requires the presence of its counterpart elsewhere in a phrase such as matching left and right parentheses
+    - Nested phrase
+        Self similar language construct such as nested arithmetic expressions or nested statement blocks in a programming language.
+
+    A Grammar
+        Consists of:
+            - a header naming the grammar.
+            - a set of rules that can invoke each other.
+
+    1.: CSV is a sequence of rows terminated by newlines.
+
+    Look for references to tokens or defined rules in nouns.
+
+    2.: A rows is a sequence of fields separated by commas.
+
+    3.: A field is a number or string
