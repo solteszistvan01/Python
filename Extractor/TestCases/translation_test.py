@@ -1,7 +1,6 @@
 import pytest
-
-def test1():
-"""
+import re
+input = """
 # Simple logical inference system: resolution and model checking for first-order logic.
 # @author Percy Liang
 
@@ -948,13 +947,12 @@ def createResolutionKB():
 
 def createModelCheckingKB():
     return KnowledgeBase(standardizationRule = None, rules = [], modelChecking = True)
+"""
 
 
 
 """
-
-"""
-Test Cases:
+Test Cases for testing the translation:
 Case 1 : Classes are extracted.
 Case 2 : Class is-a relationships are extracted.
 Case 3 : Class associations are extracted.
@@ -975,57 +973,102 @@ Notes:
     <arbitrary formal PUML stuff> is shortened by <afPs>
     <afPs> accepts the empty string
 """
+
+def Python2PUML_Class(input : str):
+    pass
+def pattern1(className: str):
+    return 'class ' + className + '{[^{}]*}'
+
+def pattern2(parent : str, child : str):
+    return parent + " <-- " + child
+
+
+def pattern3(className : str, Variables : list):
+    """
+    Formalize that the input string contains the following expressions as substrings:
+    class Constant{\n <afPs> 'name' <afPs> \n <afPs> 'strRepn' <afPs>}
+    """
+    result = 'class ' + className + "{\n"
+    for var in Variables:
+        result += '[^{}]*' + var + '[^{}]*\n'
+    result += '}'
+    return result
+
+classDefinitions = Python2PUML_Class(input)
+classNames = [
+                'Expression', 'Formula', 'Term', 'Variable', 'Constant', 'Atom',
+                'Not', 'And', 'Or', 'Implies',
+                'Forall', 'Rule', 'UnaryRule', 'BinaryRule', 'ToCNFRule', 'ResolutionRule',
+                'Derivation', 'KnowledgeBase']
 def case1():
-    """
-    Formalize that the input string contains the following expressions as substrings:
+    for className in classNames:
+        assert type(re.search(pattern1(className), classDefinitions)) != None
 
-    'class Expression{<arbitrary formal PUML stuff>}'
-    'class Formula{<arbitrary formal PUML stuff>}'
-    'class Term{<arbitrary formal PUML stuff>}'
-    'class Variable{<arbitrary formal PUML stuff>}'
-    'class Constant{<arbitrary formal PUML stuff>}'
-    'class Atom{<arbitrary formal PUML stuff>}'
-    'class Not{<arbitrary formal PUML stuff>}'
-    'class And{<arbitrary formal PUML stuff>}'
-    'class Or{<arbitrary formal PUML stuff>}'
-    'class Implies{<arbitrary formal PUML stuff>}'
-    'class Forall{<arbitrary formal PUML stuff>}'
-    'class Rule{<arbitrary formal PUML stuff>}'
-    'class UnaryRule{<arbitrary formal PUML stuff>}'
-    'class BinaryRule{<arbitrary formal PUML stuff>}'
-    'class ToCNFRule{<arbitrary formal PUML stuff>}'
-    'class ResolutionRule{<arbitrary formal PUML stuff>}'
-    'class Derivation{<arbitrary formal PUML stuff>}'
-    'class KnowledgeBase{<arbitrary formal PUML stuff>}
-    """
-
+parent_child = {
+    "Expression" : "Formula",
+    "Expression" : "Term",
+    "Term" : "Variable",
+    "Term" : "Constant",
+    "Formula" : "Atom",
+    "Formula" : "Not",
+    "Formula" : "And",
+    "Formula" : "Or",
+    "Formula" : "Exists",
+    "Formula" : "Forall",
+    "Rule" : "UnaryRule",
+    "Rule" : "BinaryRule",
+    "UnaryRule" : "ToCNFRule",
+    "BinaryRule" : "ResolutionRule"
+}
 def case2():
-    """
-    Formalize that the input string contains the following expressions as substrings:
+    for parent in parent_child:
+        assert type(re.search(pattern2(parent,parent_child[parent]))) != None
 
-    Expression <-- Formula
-    Expression <-- Term
-    Term <-- Variable
-    Term <-- Constant
-    Formula <-- Atom
-    Formula <-- Not
-    Formula <-- And
-    Formula <-- Or
-    Formula <-- Exists
-    Formula <-- Forall
-    Rule <-- UnaryRule
-    Rule <-- BinaryRule
-    UnaryRule <-- ToCNFRule
-    BinaryRule <-- ResolutionRule
-    """
-
+class_memberVars = {
+    "Variable" : ["name", "strRepn"],
+    "Constant" : ["name", "strRepn"],
+    "Atom" : ["name", "args", "strRepn"],
+    "Not" : ["arg", "strRepn"],
+    "And" : ["arg1", "arg2", "strRepn"],
+    "Or" : ["arg1", "arg2", "strRepn"],
+    "Implies" : ["arg1", "arg2", "strRepn"],
+    "Exists" : ["var", "body", "strRepn"],
+    "Forall" : ["var", "body", "strRepn"],
+    "ToCNFRule" : ["varCounts"],
+    "Derivation" : ["form", "children", "cost", "permanent", "derived"],
+    "KBResponse" : ["query", "modify", "status", "trueModel", "falseModel"],
+    "KnowledgeBase" : ["standardizationRule", "rules", "modelChecking", "verbose", "derivations"]
+}
 def case4():
     """
     Formalize that the input string contains the following expressions as substrings:
     class Constant{\n <afPs> 'name' <afPs> \n <afPs> 'strRepn' <afPs>}
-
     """
+    for cl in class_memberVars:
+        assert type(re.search(pattern3(cl, class_memberVars[cl]), classDefinitions)) != None
 
+class_memberVars_types = {
+    "Variable" : {"name" : "...",
+                  "strRepn" : "None"
+                  },
+    "Constant" : {"name" : "...",
+                  "strRepn" : "None"
+                  },
+    "Atom" : {"name" : "...",
+              "args" : "list",
+              "strRepn" : "None"
+              },
+    "Not" : ["arg", "strRepn"],
+    "And" : ["arg1", "arg2", "strRepn"],
+    "Or" : ["arg1", "arg2", "strRepn"],
+    "Implies" : ["arg1", "arg2", "strRepn"],
+    "Exists" : ["var", "body", "strRepn"],
+    "Forall" : ["var", "body", "strRepn"],
+    "ToCNFRule" : ["varCounts"],
+    "Derivation" : ["form", "children", "cost", "permanent", "derived"],
+    "KBResponse" : ["query", "modify", "status", "trueModel", "falseModel"],
+    "KnowledgeBase" : ["standardizationRule", "rules", "modelChecking", "verbose", "derivations"]
+}
 def case5():
     """
     Formalize that the input string contains the following expressions as substrings:
