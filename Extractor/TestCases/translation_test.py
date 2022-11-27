@@ -154,7 +154,7 @@ def case6(translation : str):
     """
 
 def case7():
-
+    #sTaRT
     """
     Formalize that the input string contains the following expressions as substrings:
 
