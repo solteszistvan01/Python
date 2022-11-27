@@ -1,14 +1,186 @@
 @startuml
 'https://plantuml.com/class-diagram
+Expression <-- Formula
+Expression <-- Term
+Term <-- Variable
+Term <-- Constant
+Formula <-- Atom
+Formula <-- Not
+Formula <-- And
+Formula <-- Or
+Formula <-- Implies
+Formula <-- Exists
+Formula <-- Forall
+Rule <-- UnaryRule
+Rule <-- BinaryRUle
+UnaryRule <-- ToCNFRule
+BinaryRule <-- ResolutionRule
 
 class Expression{
+    +ensureType(self, arg : ..., wantedType : ...) : ...
+    +ensureFormula(self, arg : ...) : ...
+    +ensureFormulas(args : ...) : ...
+    +isa(wantedType : ...) : bool
+    +join(args : ...) str
 
+    +__eq__(other) : bool
+    +__hash__() : int
     }
+abstract Expression
+
+class Variable{
+    +name : ...
+    +strRepn : ...
+
+    +Variable(name)
+    +computeStrRepn() : ...
+}
+
 class Constant{
-    +name
-    +strRepn
+    +name : ...
+    +strRepn : None
 
     +computeStrRepn(..) : ...
 }
 abstract Constant
+
+class Atom{
+    +name : ...
+    +args : list
+    +strRepn : None
+
+    +Atom(name : ..., *args : ...)
+    +computeStrRepn() : str
+}
+
+class Not{
+    +arg : ...
+    +strRepn : ...
+
+    +Not(arg : ...)
+    +computeStrRepn() : str
+}
+
+class And{
+    +arg1 : ...
+    +arg2 : ...
+    +strRepn : None
+
+    +And(arg1 : ..., arg2 : ...)
+    +And(arg1 : ..., arg2 : ...)
+}
+
+class Or{
+    +arg1 : ...
+    +arg2 : ...
+    +strRepn : ...
+
+    +Or(arg1 : ..., arg2 : ...)
+    +computeStrRepn() : str
+}
+
+class Implies{
+    +arg1 : ...
+    +arg2 : ...
+    +strRepn : None
+
+    +Implies(arg1 : ..., arg2 : ...)
+    +computeStrRepn() : str
+}
+
+class Exists{
+    +var : ...
+    +body : ...
+    +strRepn : None
+
+    +Exists(var : ..., body : ...)
+    +computeStrRepn() : str
+}
+
+class Forall{
+    +var : ...
+    +body : ...
+    +strRepn : None
+
+    +Forall(var : ..., body : ...)
+    +computeStrRepn() : str
+}
+
+class Rule{
+}
+
+class UnaryRule{
+    +applyRule(form) : void
+}
+abstract UnaryRule
+
+class BinaryRule{
+    +applyRule(form1 : ..., form2 : ...) : void
+    +symmetric() : bool
+}
+
+class ToCNFRule{
+    +varCounts : collections.Counter
+
+    +ToCNFRule()
+    +applyRule(form : ...)
+    +removeImplications(form : ...) : ...
+    +pushNegationInwards(form : ...) : ...
+    +updateSubst(subst : ..., var : ...) : dict
+    +standardizeVariables(form : ..., subst : ...) : ...
+    +skolemize(form : ..., subst : ..., scope : ...) : ...
+    +removeUniversalQuantifiers(form : ...) : ...
+    +distribute(form : ...) : ...
+}
+
+class ResolutionRule{
+    +applyRule(form1 : ..., form2 : ...) : list
+    +symmetric() : bool
+}
+
+class Derivation{
+    +form : ...
+    +children : ...
+    +cost : ...
+    +permanent : bool
+    +derived : ...
+
+    +Derivation(form : ..., children : ..., cost : ..., derived : ...)
+    +__repr__() : str
+}
+
+class KBResponse{
+    +query : ...
+    +modify : ...
+    +status : ...
+    +trueModel : ...
+    +falseModel : ...
+
+    +KBResponse(query : ..., modify : ..., status : ..., trueModel : ..., falseModel : ...)
+    +show(verbose=1) : void
+    +responseStr() : void
+    +__repr__() : ...
+}
+
+class KnowledgeBase{
+    +standardizationRule : ...
+    +rules : ...
+    +modelChecking : ...
+    +verbose : ...
+    +derivations : dict
+
+    +KnowledgeBase(standardizationRule : ..., rules : ..., modelChecking : ..., verbose=0)
+    +tell(form : ...) : ...
+    +ask(form : ...) : ...
+    +dump() : void
+    +query(form : ..., modify : ...) : ...
+    +standardize(form : ...) : ...
+    +addAxiom(form : ...) : bool
+    +addDerivation(deriv : ...) : bool
+    +ensureFormulas(rule : ..., formulas : ...) : ...
+    +applyUnaryRules(deriv : ...) : bool
+    +applyBinaryRules(deriv1 : ..., deriv2 : ...) : bool
+    +removeTemporary() : void
+    +makeTemporaryPermanent() : void
+}
 @enduml
